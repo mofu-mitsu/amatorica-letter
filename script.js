@@ -322,8 +322,8 @@ function setupMiniGame(type) {
         field.appendChild(hint); field.appendChild(btn);
         
         psychologyTimer = setTimeout(() => {
-            showToast("本当に押さないの？ 従順なのね♡ (ストルゲ+2)");
-            scores["ストルゲ"]+=2; historyLog.push({ scores: {"ストルゲ": 2} });
+            showToast("本当に押さないの？ 従順なのね♡ (ストルゲ+2, アナリタ+2)");
+            scores["ストルゲ"]+=2; scores["アナリタ"]+=2; historyLog.push({ scores: {"ストルゲ": 2, "アナリタ": 2} });
             nextQuestion();
         }, 5000);
 
