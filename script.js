@@ -187,6 +187,7 @@ function setupMiniGame(type) {
         submitBtn.onclick = () => {
             let val = ta.value.trim();
             let added = {}; let reply = "";
+            
             let isSameChar = /^(.)\1+$/.test(val); 
             let isSymbolOnly = /^[^a-zA-Z0-9ぁ-んァ-ヶ亜-熙]+$/.test(val); 
             let hiraganaRatio = (val.match(/[ぁ-ん]/g) || []).length / val.length;
@@ -196,8 +197,9 @@ function setupMiniGame(type) {
                 showToast("反逆の意思を確認！ (ビクトリア+5)"); added = {"ビクトリア": 5};
                 reply = "🥺「……ふふっ、語彙力の欠如は思考の放棄と見なすわ。でも、そういう防衛機制……嫌いじゃないわよ♡」";
             } else if (val === "") {
-                showToast("無言…… (ルダス+2)"); added = {"ルダス": 2};
-                reply = "🥺「何も謂わないの？ ……つまらないわね。逃げてるの？」";
+                // 【修正】無言はルダスからフィラウティアに変更！
+                showToast("無言…… (フィラウティア+2)"); added = {"フィラウティア": 2};
+                reply = "🥺「何も謂わないの？ ……他人に興味がないのか、ただの自己愛（フィラウティア）かしら。冷たいダーリンね♡」";
             } else if (val.length === 1 || isSameChar || isSymbolOnly) {
                 showToast("エラーログ？ (アナリタ+1)"); added = {"アナリタ": 1};
                 reply = `🥺「『${val}』……？ エラー吐いてるの？ それとも私をからかってるつもり？♡」`;
@@ -210,6 +212,10 @@ function setupMiniGame(type) {
             } else if (val.includes("なぜなら") || val.includes("理由") || val.includes("論理")) {
                 showToast("論理的な分析 (アナリタ+3)"); added = {"アナリタ": 3};
                 reply = "🥺「ふふ、そうやってすぐ理屈で防衛する。不器用なところ、観察のしがいがあるわ♡」";
+            } else if (/[wｗ笑草爆笑]|藁/.test(val)) {
+                // 【新規】ネットスラングお笑い系(草・w・笑など)はルダス判定！
+                showToast("遊び心 (ルダス+2)"); added = {"ルダス": 2};
+                reply = "🥺「『w』？ 『笑』？ 恋愛の観測ログでまでおちゃらけるのね。そんな遊び心（ルダス）、私は嫌いじゃないけれど♡」";
             } else if (/好き|すき|スキ|愛/.test(val)) {
                 showToast("単純明快な情熱 (エロス+2)"); added = {"エロス": 2};
                 reply = "🥺「単純明快な情熱ね。でも、それだけで私を満たせると思ってる？♡」";
@@ -225,11 +231,9 @@ function setupMiniGame(type) {
             }
             
             document.getElementById("darling-text").innerHTML = reply;
-            // 【GAS用詳細ログ作成】自由入力の内容
             let logText = `[好きって謂って] 入力: "${val}" -> 判定結果: ${Object.keys(added).join(", ")}`;
             historyLog.push({ log: logText, scores: added }); 
             for(let k in added) scores[k] += added[k];
-            
             btnRow.style.display = "none";
             setTimeout(nextQuestion, 3500); 
         };
