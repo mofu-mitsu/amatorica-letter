@@ -638,7 +638,7 @@ function saveImage() {
 }
 
 function shareResult() {
-    const text = `私の愛の形は【${document.getElementById("main-type-name").innerText}】、特に【${document.getElementById("top-traits-name").innerText}】が強いみたい！\n🥺「ダーリンの構造、丸見えよ♡」\n#アマトリカ観測 #歪な愛のラブレター\n`;
+    const text = `私の愛の形は【${document.getElementById("main-type-name").innerText}】、特に【${document.getElementById("top-traits-name").innerText}】が強いみたい！\n🥺「ダーリンの構造、丸見えよ♡」\n#アマトリカ #歪な愛のラブレター\n`;
     if (navigator.share) {
         navigator.share({ title: 'アマトリカ観測', text: text, url: window.location.href }).catch(console.error);
     } else { 
