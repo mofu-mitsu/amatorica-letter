@@ -147,8 +147,17 @@ function showQuestion() {
 
 function answer(points) {
     const target = questionsData[currentQuestion].target;
-    historyLog.push({ target: target, points: points });
-    scores[target] += points;
+    
+    // 【得点調整】ミニゲームに上書きされないよう、通常質問の配点を大幅強化！
+    let adjustedPoints = 0;
+    if (points === 2) adjustedPoints = 5;       // 激しく同意する
+    else if (points === 1) adjustedPoints = 2;  // まあ、そうかも
+    else if (points === 0) adjustedPoints = 0;  // どちらともいえない
+    else if (points === -1) adjustedPoints = -2; // あまり思わない
+    else if (points === -2) adjustedPoints = -5; // 全く思わない
+
+    historyLog.push({ target: target, points: adjustedPoints });
+    scores[target] += adjustedPoints;
     nextQuestion();
 }
 
@@ -179,14 +188,15 @@ function setupMiniGame(type) {
         field.appendChild(ta);
         const btnRow = document.createElement("div");
         const submitBtn = document.createElement("button"); submitBtn.className = "submit-love-btn"; submitBtn.innerText = "愛を伝える♡";
-        
+        btnRow.appendChild(submitBtn);
+        field.appendChild(btnRow);
+
         submitBtn.onclick = () => {
             let val = ta.value.trim();
             let added = {}; let reply = "";
             
-            // 判定用変数
-            let isSameChar = /^(.)\1+$/.test(val); // 同じ文字の連続（あああ等）
-            let isSymbolOnly = /^[^a-zA-Z0-9ぁ-んァ-ヶ亜-熙]+$/.test(val); // 記号のみ
+            let isSameChar = /^(.)\1+$/.test(val); 
+            let isSymbolOnly = /^[^a-zA-Z0-9ぁ-んァ-ヶ亜-熙]+$/.test(val); 
             let hiraganaRatio = (val.match(/[ぁ-ん]/g) || []).length / val.length;
             let kanjiRatio = (val.match(/[一-龠]/g) || []).length / val.length;
             
@@ -197,25 +207,25 @@ function setupMiniGame(type) {
                 showToast("無言…… (ルダス+2)"); added = {"ルダス": 2};
                 reply = "🥺「何も謂わないの？ ……つまらないわね。逃げてるの？」";
             } else if (val.length === 1 || isSameChar || isSymbolOnly) {
-                // 適当な文字列判定（記号、1文字、同じ文字の連続）
                 showToast("エラーログ？ (アナリタ+1)"); added = {"アナリタ": 1};
                 reply = `🥺「『${val}』……？ エラー吐いてるの？ それとも私をからかってるつもり？♡」`;
+            } else if (val.includes("多分") || val.includes("はず")) {
+                // 【新規】LIIお決まりの慎重な好意検知
+                showToast("慎重な論理好意 (アナリタ+2, フィリア+1)"); added = {"アナリタ": 2, "フィリア": 1};
+                reply = "🥺「『多分』？ 『はず』？ ふふ、感情のログにすら理屈で余白を残そうとするのね。ダーリンのそういう不器用なFi、本当に愛おしいわ♡」";
             } else if (val.length >= 20) {
                 showToast("激重長文ログ検出！ (マニア+3)"); added = {"マニア": 3};
-                reply = "🥺「わぁ……すごい情報量。ダーリンの重たい感情ログ、しっかり保存させてもらうわね♡」";
-            } else if (/好き|すき|スキ|愛/.test(val)) {
-                // ひらがな・カタカナのスキにも対応！
-                showToast("単純明快な情熱 (エロス+2)"); added = {"エロス": 2};
-                reply = "🥺「単純明快な情熱ね。でも、それだけで私を満たせると思ってる？♡」";
+                reply = "🥺「わぁ……すごい情報量。ダーリンの重たい感情ログ、しっかり保存させてもらわねば♡」";
             } else if (val.includes("なぜなら") || val.includes("理由") || val.includes("論理")) {
                 showToast("論理的な分析 (アナリタ+3)"); added = {"アナリタ": 3};
                 reply = "🥺「ふふ、そうやってすぐ理屈で防衛する。不器用なところ、観察のしがいがあるわ♡」";
+            } else if (/好き|すき|スキ|愛/.test(val)) {
+                showToast("単純明快な情熱 (エロス+2)"); added = {"エロス": 2};
+                reply = "🥺「単純明快な情熱ね。でも、それだけで私を満たせると思ってる？♡」";
             } else if (hiraganaRatio > 0.7) {
-                // ひらがな多め
                 showToast("柔らかい言葉 (ストルゲ+2, フィリア+1)"); added = {"ストルゲ": 2, "フィリア": 1};
                 reply = "🥺「ふふっ、なんだか気が抜けるわね。そういう柔らかい構造、嫌いじゃないわよ♡」";
             } else if (kanjiRatio > 0.5) {
-                // 漢字多め
                 showToast("堅苦しいログ (アナリタ+2, プラグマ+1)"); added = {"アナリタ": 2, "プラグマ": 1};
                 reply = "🥺「漢字だらけの堅苦しいログね。私に隙を見せたくないのかしら？♡」";
             } else {
