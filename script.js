@@ -67,10 +67,19 @@ function createParticles() {
     }, 400);
 }
 
-function showToast(msg) {
+function showToast(msg, duration = 3000) {
     const toast = document.getElementById("toast-container");
-    toast.innerText = msg; toast.classList.remove("hidden");
-    setTimeout(() => { toast.classList.add("hidden"); }, 3000);
+    toast.innerText = msg; 
+    toast.classList.remove("hidden");
+    
+    // 【重要】前のトーストのタイマーが残っていたら強制クリアして上書きする
+    if (window.toastTimer) {
+        clearTimeout(window.toastTimer);
+    }
+    
+    window.toastTimer = setTimeout(() => { 
+        toast.classList.add("hidden"); 
+    }, duration);
 }
 
 function openHelpModal() { document.getElementById("help-modal").classList.remove("hidden"); }
@@ -399,20 +408,57 @@ function setupMiniGame(type) {
     // ⑦ 逃げるハート
     else if (type === "catch") {
         field.style.overflow = "hidden";
-        const heart = document.createElement("div"); heart.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        let escapeCount = 0;
+        let catchAdded = { "ルダス": 0, "ビクトリア": 0 };
+        
+        const heart = document.createElement("div"); 
+        heart.innerHTML = '<i class="fa-solid fa-heart"></i>';
         heart.className = "moving-heart"; heart.style.top = "50px"; heart.style.left = "40%";
         
         const runAway = (e) => { 
             e.preventDefault(); 
-            const maxX = field.clientWidth - 40; const maxY = field.clientHeight - 80;
-            heart.style.top = Math.random() * maxY + "px"; heart.style.left = Math.random() * maxX + "px"; 
+            
+            // 逃げる（タップしようとして触られた）たびに0.1点ずつ加点！
+            escapeCount++;
+            scores["ルダス"] += 0.1;
+            scores["ビクトリア"] += 0.1;
+            catchAdded["ルダス"] += 0.1;
+            catchAdded["ビクトリア"] += 0.1;
+
+            if (escapeCount < 10) {
+                // 10回逃げるまでは超スピードワープ
+                const maxX = field.clientWidth - 40; const maxY = field.clientHeight - 80;
+                heart.style.top = Math.random() * maxY + "px"; heart.style.left = Math.random() * maxX + "px"; 
+                showToast(`逃げられた！ (ルダス+0.1, ビクトリア+0.1)`);
+            } else {
+                // 10回追いかけたらダーリンちゃんがデレて動きを止める
+                showToast("🥺「はぁ……ダーリン、しつこい。もう観念したわ。捕まえて？」", 5500);
+                heart.style.top = "50%";
+                heart.style.left = "50%";
+                heart.style.transform = "translate(-50%, -50%)";
+                heart.style.fontSize = "50px"; 
+                
+                heart.removeEventListener("mouseover", runAway);
+                heart.removeEventListener("touchstart", runAway);
+            }
         };
-        heart.addEventListener("mouseover", runAway); heart.addEventListener("touchstart", runAway, {passive: false});
+        
+        heart.addEventListener("mouseover", runAway); 
+        heart.addEventListener("touchstart", runAway, {passive: false});
         
         heart.onclick = () => { 
-            showToast("捕まえた！💥 (ルダス+2, ビクトリア+2)"); 
-            scores["ルダス"] += 2; scores["ビクトリア"] += 2; 
-            historyLog.push({ scores: {"ルダス": 2, "ビクトリア": 2} });
+            // 最後に捕まえたらさらにボーナス+1.0！
+            showToast("捕まえた！💥 (ルダス+1.0, ビクトリア+1.0)"); 
+            scores["ルダス"] += 1.0; scores["ビクトリア"] += 1.0; 
+            catchAdded["ルダス"] += 1.0; catchAdded["ビクトリア"] += 1.0;
+            
+            // JavaScriptの小数計算バグを防ぐため、四捨五入して丸める
+            scores["ルダス"] = Math.round(scores["ルダス"] * 10) / 10;
+            scores["ビクトリア"] = Math.round(scores["ビクトリア"] * 10) / 10;
+            catchAdded["ルダス"] = Math.round(catchAdded["ルダス"] * 10) / 10;
+            catchAdded["ビクトリア"] = Math.round(catchAdded["ビクトリア"] * 10) / 10;
+
+            historyLog.push({ scores: catchAdded });
             heart.innerHTML = "💥"; 
             setTimeout(nextQuestion, 600); 
         };
