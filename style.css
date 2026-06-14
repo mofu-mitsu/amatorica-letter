@@ -1,0 +1,390 @@
+/* ベース・フォント設定 */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #110815;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+/* 手書き風フォント適用 */
+.title-text, .darling-welcome, .speech-bubble {
+    font-family: 'Yomogi', cursive;
+}
+
+/* パーティクル演出 */
+#particles-container {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.particle {
+    position: absolute;
+    top: -50px;
+    font-size: 20px;
+    animation: fall linear infinite;
+    opacity: 0.6;
+}
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    background: rgba(20, 15, 30, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(233, 69, 96, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.9);
+    border: 2px solid #5a1835;
+    position: relative;
+    z-index: 10;
+}
+
+/* ラブレター風ヘッダー装飾 */
+.love-letter::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 20px;
+    background: repeating-linear-gradient(45deg, #e94560, #e94560 10px, transparent 10px, transparent 20px, #0f3460 20px, #0f3460 30px, transparent 30px, transparent 40px);
+    border-top-left-radius: 13px;
+    border-top-right-radius: 13px;
+}
+
+.hidden { display: none !important; }
+
+.home-btn {
+    display: inline-block;
+    color: #a0a0a0;
+    text-decoration: none;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+h1 { font-size: 36px; text-align: center; color: #e94560; text-shadow: 0 0 10px rgba(233, 69, 96, 0.5); }
+h2, h3 { text-align: center; color: #e94560; }
+.subtitle { text-align: center; color: #a0a0a0; margin-bottom: 20px; }
+
+.description-box {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px dashed #e94560;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.help-btn {
+    background: none; border: 1px solid #e94560; color: #e94560;
+    padding: 8px 12px; border-radius: 5px; font-size: 14px; width: 100%;
+}
+.help-btn:hover { background: rgba(233, 69, 96, 0.2); }
+
+.darling-welcome {
+    background: rgba(233, 69, 96, 0.15);
+    border-left: 4px solid #e94560;
+    padding: 15px;
+    margin-bottom: 30px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #ffb6c1;
+}
+
+button { font-family: inherit; cursor: pointer; transition: all 0.2s; }
+
+.start-btn {
+    width: 100%; padding: 15px; font-size: 20px; font-weight: bold;
+    background: linear-gradient(45deg, #e94560, #8b0030);
+    color: white; border: none; border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+}
+.start-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6); }
+
+/* トースト通知 */
+#toast-container {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: rgba(233, 69, 96, 0.9); color: white;
+    padding: 10px 20px; border-radius: 30px; z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-weight: bold;
+}
+
+/* クイズUI */
+.nav-bar { display: flex; justify-content: space-between; margin-bottom: 15px; }
+.icon-btn { background: none; border: 1px solid #e94560; color: #e94560; padding: 5px 10px; border-radius: 5px; }
+.character-area { display: flex; align-items: flex-start; margin-bottom: 20px; }
+.character-icon { font-size: 45px; margin-right: 15px; text-shadow: 0 0 10px #e94560; }
+.speech-bubble {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid #5a1835;
+    padding: 15px; border-radius: 15px; border-top-left-radius: 0; font-size: 18px; color: #ffb6c1;
+}
+
+.question-container { background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #333; }
+#question-text { font-size: 18px; margin-bottom: 25px; min-height: 60px; }
+
+.choices button {
+    display: block; width: 100%; padding: 12px; margin-bottom: 10px;
+    background: rgba(233, 69, 96, 0.1); border: 1px solid #e94560; color: #fff; border-radius: 6px; font-size: 16px;
+}
+.choices button:hover { background: #e94560; }
+
+.progress { width: 100%; height: 8px; background: #1a0505; border-radius: 4px; margin-top: 20px; overflow: hidden; }
+#progress-bar { height: 100%; background: #e94560; width: 0%; transition: 0.3s; }
+
+/* ギミック用 */
+#minigame-field { height: 200px; position: relative; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 15px; border: 1px dashed #e94560; display:flex; flex-direction: column; justify-content:center; align-items:center; }
+.moving-heart { position: absolute; font-size: 35px; color: #e94560; cursor: pointer; user-select: none; transition: all 0.1s ease-out; }
+.skip-btn { background: #333; color: #aaa; border: none; padding: 8px 15px; border-radius: 5px; margin-top:10px; z-index: 10; position:relative; }
+
+/* 自由入力用 */
+.love-textarea { width: 90%; height: 80px; background: #111; color: #fff; border: 1px solid #e94560; border-radius: 5px; padding: 10px; margin-bottom: 10px; font-family: inherit; }
+.submit-love-btn { background: #e94560; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+
+/* お散歩芋虫 */
+.imomushi { position: fixed; top: 80%; right: -50px; font-size: 30px; cursor: pointer; z-index: 1000; transition: transform 0.1s; user-select:none; }
+.imomushi-msg { position: absolute; bottom: 40px; left: -60px; width: 220px; background: rgba(0, 0, 0, 0.9); border: 1px solid #e94560; color: white; padding: 10px; border-radius: 8px; font-size: 14px; text-align: center; pointer-events: none; }
+
+/* モーダル */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+.modal-content { background: #1a0f1a; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; border: 1px solid #e94560; max-height: 80vh; overflow-y: auto; position: relative; }
+.close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #e94560; }
+.modal-body p { margin-bottom: 15px; font-size: 15px; line-height: 1.5; }
+
+/* 結果 */
+.result-card { text-align: center; padding: 15px; background: rgba(0, 0, 0, 0.5); border-radius: 8px; margin: 15px 0; border: 1px solid #333; }
+.result-card.highlight { border-color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+.main-type { font-size: 40px; font-weight: bold; color: #fff; letter-spacing: 4px; text-shadow: 0 0 15px #e94560; margin-top: 10px;}
+.top-traits { font-size: 24px; color: #ffd700; font-weight: bold; margin-top: 10px;}
+.bar-row { display: flex; align-items: center; margin-bottom: 12px; }
+.bar-label { width: 100px; font-size: 13px; text-align: right; margin-right: 10px;}
+.bar-track { flex-grow: 1; background: #1a0505; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid #333;}
+.bar-fill { height: 100%; background: linear-gradient(90deg, #8b0030, #e94560); width: 0%; transition: 1s ease-out; }
+.bar-score { width: 30px; text-align: right; font-size: 13px; color: #aaa; }
+.action-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.action-btn, .retry-btn { padding: 12px; border-radius: 6px; font-size: 16px; border: none; color: white; font-weight: bold;}
+.action-btn { background: #0f3460; } .share-btn { background: #1da1f2; }
+.retry-btn { background: #333; }
+
+/* --- 前回のCSSに以下をそのまま追加してね！ --- */
+
+/* マチアプ風カードUI */
+.tinder-card {
+    background: #1a0f1a;
+    border: 2px solid #e94560;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+}
+.tinder-card h3 { margin-top: 0; }
+.swipe-out-left { transform: translateX(-150%) rotate(-20deg); opacity: 0; }
+.swipe-out-right { transform: translateX(150%) rotate(20deg); opacity: 0; }
+.swipe-btns { display: flex; justify-content: space-around; }
+.swipe-btn { padding: 10px 20px; font-weight: bold; border-radius: 20px; border: none; cursor: pointer; }
+.btn-no { background: #555; color: white; }
+.btn-yes { background: #e94560; color: white; }
+
+/* ラブレター */
+.letter-envelope { font-size: 80px; cursor: pointer; transition: transform 0.2s; text-shadow: 0 0 15px #e94560; }
+.letter-envelope:hover { transform: scale(1.1); }
+.letter-content { background: #fff; color: #333; padding: 20px; border-radius: 5px; font-family: 'Yomogi', cursive; font-size: 18px; transform: scale(0); transition: transform 0.3s; }
+.letter-content.open { transform: scale(1); }
+
+/* シャッフル時の注意テキスト */
+.shuffle-alert { color: #ffd700; font-weight: bold; animation: flash 1s infinite; margin-bottom: 10px; }
+@keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* Ti暴走ボタン */
+.ti-btn { background: #0f3460; color: white; border: 1px solid #5a1835; padding: 15px 30px; border-radius: 30px; font-size: 16px; transition: 0.2s; }
+.ti-btn:active { transform: scale(0.9); }
+
+/* ※前回のCSSに以下を追加・上書きしてね！ */
+
+.user-info-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #e94560;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.type-input {
+    width: 90%;
+    padding: 10px;
+    background: #111;
+    color: white;
+    border: 1px solid #5a1835;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+/* マチアプカード強化 */
+.tinder-card {
+    background: #fff;
+    color: #333;
+    border: 3px solid #e94560;
+    border-radius: 15px;
+    padding: 0;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+.card-image-area {
+    background: #f8f8f8;
+    padding: 30px;
+    font-size: 50px;
+    border-bottom: 2px solid #eee;
+}
+.card-info { padding: 15px; }
+.card-info h3 { margin: 0 0 10px 0; color: #e94560; font-size: 22px; }
+.card-info p { margin: 0; font-size: 15px; line-height: 1.4; }
+.swipe-btns { display: flex; justify-content: space-between; padding: 15px; background: #fafafa;}
+.btn-no { background: #fff; color: #555; border: 2px solid #ccc; font-size: 18px; padding: 10px 20px; border-radius: 30px;}
+.btn-yes { background: #fff; color: #e94560; border: 2px solid #e94560; font-size: 18px; padding: 10px 20px; border-radius: 30px;}
+
+/* ハート逃げギミックの下部固定 */
+.skip-btn-bottom {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(50,50,50,0.8);
+    color: #ccc;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    z-index: 100;
+}
+
+/* ラブレターの手動進行 */
+.letter-content { font-size: 15px; text-align: left; max-height: 300px; overflow-y: auto; }
+.close-letter-btn {
+    display: block; width: 100%; margin-top: 15px; padding: 10px;
+    background: #e94560; color: white; border: none; border-radius: 5px; cursor: pointer;
+}
+
+/* ※前回のCSSに以下を追加・上書きしてね！ */
+
+.user-info-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #e94560;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.type-input {
+    width: 90%;
+    padding: 10px;
+    background: #111;
+    color: white;
+    border: 1px solid #5a1835;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+/* マチアプカード強化 */
+.tinder-card {
+    background: #fff;
+    color: #333;
+    border: 3px solid #e94560;
+    border-radius: 15px;
+    padding: 0;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+.card-image-area {
+    background: #f8f8f8;
+    padding: 30px;
+    font-size: 50px;
+    border-bottom: 2px solid #eee;
+}
+.card-info { padding: 15px; }
+.card-info h3 { margin: 0 0 10px 0; color: #e94560; font-size: 22px; }
+.card-info p { margin: 0; font-size: 15px; line-height: 1.4; }
+.swipe-btns { display: flex; justify-content: space-between; padding: 15px; background: #fafafa;}
+.btn-no { background: #fff; color: #555; border: 2px solid #ccc; font-size: 18px; padding: 10px 20px; border-radius: 30px;}
+.btn-yes { background: #fff; color: #e94560; border: 2px solid #e94560; font-size: 18px; padding: 10px 20px; border-radius: 30px;}
+
+/* ハート逃げギミックの下部固定 */
+.skip-btn-bottom {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(50,50,50,0.8);
+    color: #ccc;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    z-index: 100;
+}
+
+/* ラブレターの手動進行 */
+.letter-content { font-size: 15px; text-align: left; max-height: 300px; overflow-y: auto; }
+.close-letter-btn {
+    display: block; width: 100%; margin-top: 15px; padding: 10px;
+    background: #e94560; color: white; border: none; border-radius: 5px; cursor: pointer;
+}
+
+/* --- 楽天グッズ枠 --- */
+.rakuten-box {
+    margin-top: 30px;
+    padding: 15px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: center;
+    border: 1px dashed #5a1835;
+}
+.rakuten-box a {
+    color: #ffb6c1;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+}
+.rakuten-box img {
+    max-width: 100px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #e94560;
+}
+
+/* --- スマホ向けレスポンシブ対応 --- */
+@media (max-width: 600px) {
+    body { padding: 10px; }
+    .container { padding: 15px; border-radius: 10px; }
+    h1 { font-size: 26px; }
+    .darling-welcome { font-size: 15px; padding: 10px; }
+    
+    .character-icon { font-size: 35px; }
+    .speech-bubble { font-size: 15px; padding: 10px; }
+    #question-text { font-size: 16px; margin-bottom: 15px; }
+    
+    .choices button { padding: 10px; font-size: 14px; }
+    .ti-btn { padding: 10px 20px; font-size: 14px; }
+    
+    .main-type { font-size: 30px; letter-spacing: 2px; }
+    .top-traits { font-size: 20px; }
+    
+    .tinder-card { margin-bottom: 10px; }
+    .card-image-area { padding: 20px; font-size: 40px; }
+    .card-info h3 { font-size: 18px; }
+    .card-info p { font-size: 13px; }
+    .swipe-btns { padding: 10px; }
+    .swipe-btns button { padding: 8px 15px; font-size: 14px; }
+    
+    .modal-content { padding: 20px; }
+    .modal-body p { font-size: 13px; }
+    
+    .imomushi { font-size: 24px; right: -40px; }
+}

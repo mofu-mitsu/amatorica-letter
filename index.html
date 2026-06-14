@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO & OGP 強化版 -->
+    <title>アマトリカ観測 - 歪な愛のラブレター - | 恋愛傾向・深層心理診断</title>
+    <meta name="description" content="ソシオニクスや心理学に基づく「アマトリカ（愛の形）」を観測する完全無料の性格診断ツール。エロス、フィリア、プラグマなど10種類の恋愛傾向からあなたの深層心理を分析します。">
+    <meta name="keywords" content="アマトリカ診断,アマトリカ観測,恋愛診断,ソシオニクス,性格診断,心理テスト">
+    <meta property="og:title" content="アマトリカ観測 - 歪な愛のラブレター - | 恋愛傾向診断">
+    <meta property="og:description" content="あなたの愛の形（エロス・フィリア等）を10種類のパラメータで分析する心理テスト。ダーリンちゃんの観測実験へようこそ。">
+    <meta property="og:url" content="https://mofu-mitsu.github.io/amatorica-letter/">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://mofu-mitsu.github.io/amatorica-letter/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- 絵文字Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:90px;%22>🥺</text></svg>">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Yomogi&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="particles-container"></div>
+    <div id="toast-container" class="hidden"></div>
+
+    <!-- タイトル画面 -->
+    <div id="title-screen" class="screen container love-letter">
+        <a href="https://mofu-mitsu.github.io/lab.html" class="home-btn"><i class="fa-solid fa-house"></i> ホームへ戻る</a>
+        <h1 class="title-text"><i class="fa-solid fa-envelope-open-text"></i> アマトリカ観測</h1>
+        <p class="subtitle">〜 歪な愛のラブレター 〜</p>
+        
+        <div class="description-box">
+            <p>人が「エロス」「フィリア」「アガペー」「ストルゲ」などの愛を、どのように認識しているかを10種類のパラメータで観測する実験です。</p>
+            <button class="help-btn" onclick="openHelpModal()"><i class="fa-solid fa-book-open"></i> 10種類の愛について詳しく見る</button>
+        </div>
+
+        <div class="user-info-box">
+            <p>観測精度を上げるため、あなたの自認タイプを教えてね♡</p>
+            <input type="text" id="user-type" class="type-input" placeholder="例: INTJ, LII, 5w6 など（任意）">
+        </div>
+
+        <div class="darling-welcome">
+            🥺「ねぇ、ダーリン♡<br>あなたの中に隠された愛の構造……<br>私に暴かせてくれる？」
+        </div>
+        <button class="start-btn" onclick="startDiagnosis()"><i class="fa-solid fa-heart"></i> 観測を開始する</button>
+    </div>
+
+    <!-- 診断画面 -->
+    <div id="quiz-screen" class="screen container hidden">
+        <div class="nav-bar">
+            <button id="back-btn" class="icon-btn hidden" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i> 戻る</button>
+            <span id="question-counter">Q.1</span>
+        </div>
+
+        <div class="character-area">
+            <div class="character-icon">🥺</div>
+            <div class="speech-bubble" id="darling-text"></div>
+        </div>
+
+        <div id="normal-question-area" class="question-container hidden">
+            <div id="question-text">ここに質問が表示されます</div>
+            <div class="choices" id="choices-area">
+                <button class="choice-btn" onclick="answer(2)"><i class="fa-solid fa-heart"></i> 激しく同意する♡</button>
+                <button class="choice-btn" onclick="answer(1)"><i class="fa-regular fa-heart"></i> まあ、そうかも</button>
+                <button class="choice-btn" onclick="answer(0)">どちらともいえない</button>
+                <button class="choice-btn" onclick="answer(-1)">あまり思わない</button>
+                <button class="choice-btn" onclick="answer(-2)"><i class="fa-solid fa-xmark"></i> 全く思わない・非合理的だ</button>
+            </div>
+        </div>
+
+        <div id="minigame-area" class="question-container hidden">
+            <div id="minigame-field"></div>
+        </div>
+        
+        <div class="progress">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen" class="screen container hidden">
+        <div id="capture-area">
+            <h2><i class="fa-solid fa-microscope"></i> 観測結果</h2>
+            <div class="speech-bubble">
+                🥺「ふふっ、ログの解析が終わったわ。ダーリンの構造、全部見えちゃった♡」
+            </div>
+            <div class="result-card">
+                <h3>アマトリカタイプ (基本4軸)</h3>
+                <div class="main-type" id="main-type-name">EPAS</div>
+            </div>
+            <div class="result-card highlight">
+                <h3>👑 あなたの愛の形 (上位2つ)</h3>
+                <div class="top-traits" id="top-traits-name">フィリア × プラグマ</div>
+            </div>
+            <div class="chart-container">
+                <h3><i class="fa-solid fa-chart-bar"></i> 構造パラメータ</h3>
+                <div id="all-chart"></div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button onclick="saveImage()" class="action-btn"><i class="fa-solid fa-camera"></i> 結果を画像保存</button>
+            <button onclick="shareResult()" class="action-btn share-btn"><i class="fa-solid fa-share-nodes"></i> 結果をシェア</button>
+            <button onclick="location.reload()" class="retry-btn"><i class="fa-solid fa-rotate-right"></i> もう一度観測する</button>
+            <a href="https://mofu-mitsu.github.io/lab.html" class="retry-btn" style="text-align:center; text-decoration:none;"><i class="fa-solid fa-house"></i> ホームへ戻る</a>
+        </div>
+        
+        <!-- 楽天アフィリエイト裏グッズ提案枠 -->
+        <div id="rakuten-area"></div>
+    </div>
+
+    <!-- ヘルプモーダル -->
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeHelpModal()">&times;</span>
+            <h2>10種類の愛の形</h2>
+            <div class="modal-body">
+                <p><strong><i class="fa-solid fa-fire"></i> エロス (Eros)</strong>: 情熱的でロマンチックな愛。一目惚れや身体的魅力を重視。</p>
+                <p><strong><i class="fa-solid fa-brain"></i> フィリア (Philia)</strong>: 精神的、知的な繋がりを重視する友情のような愛。</p>
+                <p><strong><i class="fa-solid fa-hand-holding-heart"></i> アガペー (Agape)</strong>: 見返りを求めない無償の愛。自己犠牲や献身。</p>
+                <p><strong><i class="fa-solid fa-house-chimney"></i> ストルゲ (Storge)</strong>: 家族のように穏やかで、自然体で長く続く愛。</p>
+                <p><strong><i class="fa-solid fa-scale-balanced"></i> プラグマ (Pragma)</strong>: 実用的で論理的な愛。相性や将来性を計算して選ぶ。</p>
+                <p><strong><i class="fa-solid fa-link"></i> マニア (Mania)</strong>: 執着と依存の愛。嫉妬深く、常に相手を求めてしまう。</p>
+                <p><strong><i class="fa-solid fa-dice"></i> ルダス (Ludus)</strong>: 遊びの愛。ゲームのように楽しみ、深く執着しない。</p>
+                <p><strong><i class="fa-solid fa-magnifying-glass"></i> アナリタ (Analita)</strong>: 分析型の愛。相手の心理や行動の理由を理論的に解釈する。</p>
+                <p><strong><i class="fa-solid fa-crown"></i> ビクトリア (Victoria)</strong>: 征服の愛。関係において優位に立ち、主導権を握りたがる。</p>
+                <p><strong><i class="fa-solid fa-seedling"></i> フィラウティア (Philautia)</strong>: 自己愛。自分自身を肯定し、大切にする健康的な愛。</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
