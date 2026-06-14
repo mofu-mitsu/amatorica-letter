@@ -17,6 +17,6 @@ const gimmickQuestions = [
     { type: "game", gameType: "letter", darling: "「……あら？ ダーリン宛てに何か届いてるみたい。私の観測ログかしら？ 開けてみて♡」" },
     { type: "game", gameType: "ti_loop", darling: "「……ダーリン、今、私の意図を過剰に分析しようとしてない？ 思考がループしてるわよ♡」" },
     { type: "game", gameType: "psychology", darling: "「ねぇ、ダーリン♡ ……絶対に、このボタン、押さないでね？ 絶対よ？」" },
-    { type: "game", gameType: "match_app", darling: "「ダーリンの好みの構造、スワイプで教えて♡ 直感で選んでいいわよ。」" },
+    { type: "game", gameType: "match_app", darling: "「ダーリンの好みの構造、教えて♡ 直感で選んでいいわよ。」" },
     { type: "game", gameType: "make_laugh", darling: "「あー……ダーリン、ずっと完璧なナビゲーター演じるのも疲れるんよ。ウチ、退屈やけん……なんかオモロいことして笑わせてや♡」" }
 ];
