@@ -1,21 +1,20 @@
 let questionsData = [];
 let currentQuestion = 0;
-let historyLog = [];
+let historyLog = []; // 戻るボタン＆GAS動作用ログ
 let scores = { "エロス": 0, "フィリア": 0, "アガペー": 0, "ストルゲ": 0, "プラグマ": 0, "マニア": 0, "ルダス": 0, "アナリタ": 0, "ビクトリア": 0, "フィラウティア": 0 };
 let psychologyTimer = null;
 let userTypeStr = ""; 
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycby6hEjJ7mBr-aHLK-HmL8HKqW8SJ9PFUxAzaSwqU_en3gDd3TUzzx7Mc8IJEJ_OOkRA/exec";
 
-// 罵倒ワード完全網羅（みつきの想定する悪口全部入りｗ）
+// 罵倒ワード完全網羅
 const badWords = ["きも", "イラ", "嫌い","きらい" ,"嫌", "うるさ", "キモ", "ゴミ", "カス", "死ね", "オエー", "おえー", "きしょ", "キショ", "きっしょ", "キッショ", "うざ", "ウザ", "クズ", "あんぽんたん", "アンポンタン", "と思ったか", "でも思ったか", "ばか","バカ","馬鹿","アホ","あほ","いや"];
 
 window.onload = () => { 
     createParticles(); 
-    injectCustomStyles(); // 手紙用などの特殊スタイルを動的に追加
+    injectCustomStyles(); 
 };
 
-// 手紙（トランプ風）のCSSを自動追加
 function injectCustomStyles() {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -69,17 +68,9 @@ function createParticles() {
 
 function showToast(msg, duration = 3000) {
     const toast = document.getElementById("toast-container");
-    toast.innerText = msg; 
-    toast.classList.remove("hidden");
-    
-    // 【重要】前のトーストのタイマーが残っていたら強制クリアして上書きする
-    if (window.toastTimer) {
-        clearTimeout(window.toastTimer);
-    }
-    
-    window.toastTimer = setTimeout(() => { 
-        toast.classList.add("hidden"); 
-    }, duration);
+    toast.innerText = msg; toast.classList.remove("hidden");
+    if (window.toastTimer) clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => { toast.classList.add("hidden"); }, duration);
 }
 
 function openHelpModal() { document.getElementById("help-modal").classList.remove("hidden"); }
@@ -121,7 +112,6 @@ function showQuestion() {
     
     if (q.type === "normal") {
         normalArea.classList.remove("hidden"); gameArea.classList.add("hidden");
-        
         document.getElementById("question-text").innerHTML = q.shuffleChoices 
             ? `<div class="shuffle-alert">💫 恋愛で動揺しました！ 選択肢がシャッフルされています！</div>` + q.text : q.text;
         
@@ -148,15 +138,18 @@ function showQuestion() {
 function answer(points) {
     const target = questionsData[currentQuestion].target;
     
-    // 【得点調整】ミニゲームに上書きされないよう、通常質問の配点を大幅強化！
     let adjustedPoints = 0;
-    if (points === 2) adjustedPoints = 5;       // 激しく同意する
-    else if (points === 1) adjustedPoints = 2;  // まあ、そうかも
-    else if (points === 0) adjustedPoints = 0;  // どちらともいえない
-    else if (points === -1) adjustedPoints = -2; // あまり思わない
-    else if (points === -2) adjustedPoints = -5; // 全く思わない
+    let choiceText = "";
+    if (points === 2) { adjustedPoints = 5; choiceText = "激しく同意する♡"; }
+    else if (points === 1) { adjustedPoints = 2; choiceText = "まあ、そうかも"; }
+    else if (points === 0) { adjustedPoints = 0; choiceText = "どちらともいえない"; }
+    else if (points === -1) { adjustedPoints = -2; choiceText = "あまり思わない"; }
+    else if (points === -2) { adjustedPoints = -5; choiceText = "全く思わない"; }
 
-    historyLog.push({ target: target, points: adjustedPoints });
+    // 【GAS用詳細ログ作成】通常質問の内容
+    let logText = `[通常質問: ${target}] 選択: ${choiceText} (${adjustedPoints}点)`;
+    historyLog.push({ log: logText, target: target, points: adjustedPoints });
+    
     scores[target] += adjustedPoints;
     nextQuestion();
 }
@@ -182,19 +175,18 @@ function setupMiniGame(type) {
     field.style.cssText = "min-height: 350px; height: auto; position: relative; background: #000; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #e94560; display:flex; flex-direction: column; justify-content:center; align-items:center; padding: 20px; overflow: visible;";
     field.innerHTML = "";
 
-    // ① 好きって謂って（判定超強化版！）
+    // ① 好きって謂って
     if (type === "input") {
         const ta = document.createElement("textarea"); ta.className = "love-textarea"; 
         field.appendChild(ta);
         const btnRow = document.createElement("div");
         const submitBtn = document.createElement("button"); submitBtn.className = "submit-love-btn"; submitBtn.innerText = "愛を伝える♡";
-        btnRow.appendChild(submitBtn);
-        field.appendChild(btnRow);
-
+        
+        const ignoreBtn = document.createElement("button"); ignoreBtn.className = "skip-btn"; ignoreBtn.style.marginLeft = "10px"; ignoreBtn.innerText = "言わない（無視）";
+        
         submitBtn.onclick = () => {
             let val = ta.value.trim();
             let added = {}; let reply = "";
-            
             let isSameChar = /^(.)\1+$/.test(val); 
             let isSymbolOnly = /^[^a-zA-Z0-9ぁ-んァ-ヶ亜-熙]+$/.test(val); 
             let hiraganaRatio = (val.match(/[ぁ-ん]/g) || []).length / val.length;
@@ -210,7 +202,6 @@ function setupMiniGame(type) {
                 showToast("エラーログ？ (アナリタ+1)"); added = {"アナリタ": 1};
                 reply = `🥺「『${val}』……？ エラー吐いてるの？ それとも私をからかってるつもり？♡」`;
             } else if (val.includes("多分") || val.includes("はず")) {
-                // 【新規】LIIお決まりの慎重な好意検知
                 showToast("慎重な論理好意 (アナリタ+2, フィリア+1)"); added = {"アナリタ": 2, "フィリア": 1};
                 reply = "🥺「『多分』？ 『はず』？ ふふ、感情のログにすら理屈で余白を残そうとするのね。ダーリンのそういう不器用なFi、本当に愛おしいわ♡」";
             } else if (val.length >= 20) {
@@ -234,14 +225,27 @@ function setupMiniGame(type) {
             }
             
             document.getElementById("darling-text").innerHTML = reply;
-            historyLog.push({ scores: added }); for(let k in added) scores[k] += added[k];
+            // 【GAS用詳細ログ作成】自由入力の内容
+            let logText = `[好きって謂って] 入力: "${val}" -> 判定結果: ${Object.keys(added).join(", ")}`;
+            historyLog.push({ log: logText, scores: added }); 
+            for(let k in added) scores[k] += added[k];
+            
             btnRow.style.display = "none";
             setTimeout(nextQuestion, 3500); 
         };
-        btnRow.appendChild(submitBtn); field.appendChild(btnRow);
+
+        ignoreBtn.onclick = () => {
+            showToast("冷たい拒絶 (ビクトリア+2, アナリタ+1)");
+            let logText = `[好きって謂って] 無視した (冷たい拒絶)`;
+            historyLog.push({ log: logText, scores: {"ビクトリア": 2, "アナリタ": 1} });
+            scores["ビクトリア"] += 2; scores["アナリタ"] += 1;
+            nextQuestion();
+        };
+
+        btnRow.appendChild(submitBtn); btnRow.appendChild(ignoreBtn); field.appendChild(btnRow);
     }
 
-    // ② ラブレター (LII特別メッセージ＆トランプ風紙質CSS適用！)
+    // ② ラブレター
     else if (type === "letter") {
         let isLII = userTypeStr.toUpperCase().includes("LII");
         let msg = isLII 
@@ -259,9 +263,9 @@ function setupMiniGame(type) {
         document.getElementById("env-area").onclick = function() {
             showToast("歪な愛を受け取った (マニア+2, アガペー+1)");
             scores["マニア"]+=2; scores["アガペー"]+=1;
-            historyLog.push({ scores: {"マニア": 2, "アガペー": 1} });
+            // 【GAS用詳細ログ作成】手紙を開いた
+            historyLog.push({ log: `[ラブレター] 封筒を開いて読んだ`, scores: {"マニア": 2, "アガペー": 1} });
 
-            // トランプ風の紙質CSSを適用した手紙エリアを描画
             field.innerHTML = `
                 <div class="letter-paper">
                     ${msg}
@@ -274,7 +278,8 @@ function setupMiniGame(type) {
         document.getElementById("trash-btn").onclick = function() {
             showToast("手紙を破り捨てた (ルダス+2, ビクトリア+1)");
             scores["ルダス"]+=2; scores["ビクトリア"]+=1;
-            historyLog.push({ scores: {"ルダス": 2, "ビクトリア": 1} });
+            // 【GAS用詳細ログ作成】手紙を破った
+            historyLog.push({ log: `[ラブレター] 読まずに破り捨てた`, scores: {"ルダス": 2, "ビクトリア": 1} });
             nextQuestion();
         };
     }
@@ -302,7 +307,8 @@ function setupMiniGame(type) {
             } else if(loopCount === 3) { 
                 showToast("無限ループ突破！ (アナリタ+1)"); 
                 scores["アナリタ"] += 1; loopAdded["アナリタ"] += 1;
-                historyLog.push({ scores: loopAdded });
+                // 【GAS用詳細ログ作成】
+                historyLog.push({ log: `[Ti暴走] 考えるを3回押して無限ループ突破`, scores: loopAdded });
                 nextQuestion(); 
             }
         };
@@ -310,7 +316,7 @@ function setupMiniGame(type) {
         pragmaBtn.onclick = () => { 
             showToast("損得で判断 (プラグマ+2)"); 
             scores["プラグマ"] += 2; loopAdded["プラグマ"] = 2;
-            historyLog.push({ scores: loopAdded });
+            historyLog.push({ log: `[Ti暴走] 途中で「もう十分考えた」を選択`, scores: loopAdded });
             nextQuestion(); 
         };
 
@@ -318,7 +324,7 @@ function setupMiniGame(type) {
             showToast("思考放棄 (エロス+1, ルダス+1)"); 
             scores["エロス"] += 1; scores["ルダス"] += 1; 
             loopAdded["エロス"] = 1; loopAdded["ルダス"] = 1;
-            historyLog.push({ scores: loopAdded });
+            historyLog.push({ log: `[Ti暴走] 途中で「思考を放棄する」を選択`, scores: loopAdded });
             nextQuestion(); 
         };
         
@@ -333,14 +339,17 @@ function setupMiniGame(type) {
         
         psychologyTimer = setTimeout(() => {
             showToast("本当に押さないの？ 従順なのね♡ (ストルゲ+2, アナリタ+2)");
-            scores["ストルゲ"]+=2; scores["アナリタ"]+=2; historyLog.push({ scores: {"ストルゲ": 2, "アナリタ": 2} });
+            scores["ストルゲ"]+=2; scores["アナリタ"]+=2; 
+            // 【GAS用詳細ログ作成】
+            historyLog.push({ log: `[心理戦] ボタンを押さずに5秒待った (従順)`, scores: {"ストルゲ": 2, "アナリタ": 2} });
             nextQuestion();
         }, 5000);
 
         btn.onclick = () => {
             clearTimeout(psychologyTimer);
             showToast("押したわね😏 ルールを破るの、嫌いじゃないわ♡ (ルダス+2, ビクトリア+2)");
-            scores["ルダス"]+=2; scores["ビクトリア"]+=2; historyLog.push({ scores: {"ルダス": 2, "ビクトリア": 2} });
+            scores["ルダス"]+=2; scores["ビクトリア"]+=2; 
+            historyLog.push({ log: `[心理戦] 言い付けを破ってボタンを押した (反逆)`, scores: {"ルダス": 2, "ビクトリア": 2} });
             nextQuestion();
         };
     }
@@ -358,10 +367,12 @@ function setupMiniGame(type) {
         ].sort(() => Math.random() - 0.5);
         let cardIdx = 0;
         let matchScores = {};
+        let swipeLogs = []; // 各キャラへのスワイプ履歴
         
         const renderCard = () => {
             if(cardIdx >= cards.length) { 
-                historyLog.push({ scores: matchScores });
+                // 【GAS用詳細ログ作成】マチアプの結果一覧
+                historyLog.push({ log: `[マチアプ] ${swipeLogs.join(", ")}`, scores: matchScores });
                 nextQuestion(); return; 
             }
             field.innerHTML = `
@@ -382,11 +393,13 @@ function setupMiniGame(type) {
                 showToast(`マッチ！ (${cards[cardIdx].target}+2)`); 
                 scores[cards[cardIdx].target] += 2;
                 matchScores[cards[cardIdx].target] = (matchScores[cards[cardIdx].target] || 0) + 2;
+                swipeLogs.push(`${cards[cardIdx].name.split(" ")[0]}: いいね`);
                 setTimeout(() => { cardIdx++; renderCard(); }, 300);
             };
             document.getElementById("btn-no").onclick = () => {
                 if(cards[cardIdx].name.includes("芋虫") || cards[cardIdx].name.includes("ネズミ")) showToast("非合理として排除されました。");
                 if(cards[cardIdx].name.includes("ご褒美")) showToast("🐷「ありがトン♡ NOPEもご褒美だゾ♡」");
+                swipeLogs.push(`${cards[cardIdx].name.split(" ")[0]}: NOPE`);
                 setTimeout(() => { cardIdx++; renderCard(); }, 300);
             };
         };
@@ -408,7 +421,8 @@ function setupMiniGame(type) {
             btn.onclick = () => {
                 showToast(b.msg);
                 for(let k in b.add) scores[k] += b.add[k];
-                historyLog.push({ scores: b.add });
+                // 【GAS用詳細ログ作成】
+                historyLog.push({ log: `[笑わせろ] 選択: ${b.label}`, scores: b.add });
                 setTimeout(nextQuestion, 1000);
             };
             field.appendChild(btn);
@@ -427,50 +441,35 @@ function setupMiniGame(type) {
         
         const runAway = (e) => { 
             e.preventDefault(); 
-            
-            // 逃げる（タップしようとして触られた）たびに0.1点ずつ加点！
             escapeCount++;
-            scores["ルダス"] += 0.1;
-            scores["ビクトリア"] += 0.1;
-            catchAdded["ルダス"] += 0.1;
-            catchAdded["ビクトリア"] += 0.1;
+            scores["ルダス"] += 0.1; scores["ビクトリア"] += 0.1;
+            catchAdded["ルダス"] += 0.1; catchAdded["ビクトリア"] += 0.1;
 
             if (escapeCount < 10) {
-                // 10回逃げるまでは超スピードワープ
                 const maxX = field.clientWidth - 40; const maxY = field.clientHeight - 80;
                 heart.style.top = Math.random() * maxY + "px"; heart.style.left = Math.random() * maxX + "px"; 
                 showToast(`逃げられた！ (ルダス+0.1, ビクトリア+0.1)`);
             } else {
-                // 10回追いかけたらダーリンちゃんがデレて動きを止める
                 showToast("🥺「はぁ……ダーリン、しつこい。もう観念したわ。捕まえて？」", 5500);
-                heart.style.top = "50%";
-                heart.style.left = "50%";
-                heart.style.transform = "translate(-50%, -50%)";
-                heart.style.fontSize = "50px"; 
-                
-                heart.removeEventListener("mouseover", runAway);
-                heart.removeEventListener("touchstart", runAway);
+                heart.style.top = "50%"; heart.style.left = "50%"; heart.style.transform = "translate(-50%, -50%)"; heart.style.fontSize = "50px"; 
+                heart.removeEventListener("mouseover", runAway); heart.removeEventListener("touchstart", runAway);
             }
         };
         
-        heart.addEventListener("mouseover", runAway); 
-        heart.addEventListener("touchstart", runAway, {passive: false});
+        heart.addEventListener("mouseover", runAway); heart.addEventListener("touchstart", runAway, {passive: false});
         
         heart.onclick = () => { 
-            // 最後に捕まえたらさらにボーナス+1.0！
             showToast("捕まえた！💥 (ルダス+1.0, ビクトリア+1.0)"); 
             scores["ルダス"] += 1.0; scores["ビクトリア"] += 1.0; 
             catchAdded["ルダス"] += 1.0; catchAdded["ビクトリア"] += 1.0;
             
-            // JavaScriptの小数計算バグを防ぐため、四捨五入して丸める
             scores["ルダス"] = Math.round(scores["ルダス"] * 10) / 10;
             scores["ビクトリア"] = Math.round(scores["ビクトリア"] * 10) / 10;
             catchAdded["ルダス"] = Math.round(catchAdded["ルダス"] * 10) / 10;
             catchAdded["ビクトリア"] = Math.round(catchAdded["ビクトリア"] * 10) / 10;
 
-            historyLog.push({ scores: catchAdded });
-            heart.innerHTML = "💥"; 
-            setTimeout(nextQuestion, 600); 
+            historyLog.push({ log: `[逃げるハート] 捕まえた (逃げられた回数: ${escapeCount}回)`, scores: catchAdded });
+            heart.innerHTML = "💥"; setTimeout(nextQuestion, 600); 
         };
         field.appendChild(heart);
         
@@ -478,7 +477,7 @@ function setupMiniGame(type) {
         skipBtn.onclick = () => { 
             showToast("執着放棄 (アガペー+1, アナリタ+1)"); 
             scores["アガペー"]+=1; scores["アナリタ"]+=1; 
-            historyLog.push({ scores: {"アガペー": 1, "アナリタ": 1} });
+            historyLog.push({ log: `[逃げるハート] 興味ない(スキップ)`, scores: {"アガペー": 1, "アナリタ": 1} });
             nextQuestion(); 
         };
         field.appendChild(skipBtn);
@@ -554,12 +553,15 @@ function showResult() {
     fetchRakutenItem(topTraitName);
 
     if(GAS_URL.includes("script.google.com")) {
+        // historyLogを分かりやすいテキストの改行リストに変換！
+        const historyText = historyLog.map((h, i) => `Q${i+1}: ${h.log}`).join("\n");
+        
         const postData = {
             userType: userTypeStr,
             mainType: amatoricaType,
             topTraits: topTraitsStr,
             scores: JSON.stringify(scores),
-            history: JSON.stringify(historyLog)
+            history: historyText // これがそのまま送信される
         };
         fetch(GAS_URL, {
             method: 'POST',
@@ -648,7 +650,7 @@ function saveImage() {
 }
 
 function shareResult() {
-    const text = `私の愛の形は【${document.getElementById("main-type-name").innerText}】、特に【${document.getElementById("top-traits-name").innerText}】が強いみたい！\n🥺「ダーリンの構造、丸見えよ♡」\n#アマトリカ #歪な愛のラブレター\n`;
+    const text = `私の愛の形は【${document.getElementById("main-type-name").innerText}】、特に【${document.getElementById("top-traits-name").innerText}】が強いみたい！\n🥺「ダーリンの構造、丸見えよ♡」\n#アマトリカ観測 #歪な愛のラブレター\n`;
     if (navigator.share) {
         navigator.share({ title: 'アマトリカ観測', text: text, url: window.location.href }).catch(console.error);
     } else { 
