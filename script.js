@@ -239,10 +239,10 @@ function setupMiniGame(type) {
         };
 
         ignoreBtn.onclick = () => {
-            showToast("冷たい拒絶 (ビクトリア+2, アナリタ+1)");
+            showToast("冷たい拒絶 (フィラウティア+2, ビクトリア+1)");
             let logText = `[好きって謂って] 無視した (冷たい拒絶)`;
-            historyLog.push({ log: logText, scores: {"ビクトリア": 2, "アナリタ": 1} });
-            scores["ビクトリア"] += 2; scores["アナリタ"] += 1;
+            historyLog.push({ log: logText, scores: {"フィラウティア": 2, "ビクトリア": 1} });
+            scores["フィラウティア"] += 2; scores["ビクトリア"] += 1;
             nextQuestion();
         };
 
