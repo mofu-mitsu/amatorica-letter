@@ -220,7 +220,7 @@ function setupMiniGame(type) {
                 // 【新規】ネットスラングお笑い系(草・w・笑など)はルダス判定！
                 showToast("遊び心 (ルダス+2)"); added = {"ルダス": 2};
                 reply = "🥺「『w』？ 『笑』？ 恋愛の観測ログでまでおちゃらけるのね。そんな遊び心（ルダス）、私は嫌いじゃないけれど♡」";
-            } else if (/好き|すき|スキ|愛/.test(val)) {
+            } else if (/好き|すき|スキ|結婚|愛/.test(val)) {
                 showToast("単純明快な情熱 (エロス+2)"); added = {"エロス": 2};
                 reply = "🥺「単純明快な情熱ね。でも、それだけで私を満たせると思ってる？♡」";
             } else if (hiraganaRatio > 0.7) {
